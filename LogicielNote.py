@@ -1,5 +1,5 @@
 import sys, json
-from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
+from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 # from PySide2.QtGui import QPixmap
 import numpy as np
 # import matplotlib.pyplot as plt
@@ -31,7 +31,11 @@ class MainWindow(QMainWindow):
         self.ui.cBClasseGPNote.currentIndexChanged.connect(self.updateMatiere)
         self.ui.cBMatiereGBNote.currentIndexChanged.connect(self.updateSaisieEleve)
 
-        self.ui.pBNoterNote.clicked.connect(self.ajoutNoteDevoir)
+        self.ui.pBValiderNotation.clicked.connect(self.ajoutNote)
+
+        self.ui.pBNoterNote.clicked.connect(self.ajoutAcademie)
+        self.ui.pBModifierNote.clicked.connect(self.ajoutEtablissement)
+
 
         # Il faut charger les académies dans la comboBox:
         self.updateAcademie()
@@ -39,12 +43,37 @@ class MainWindow(QMainWindow):
     def updateAcademie (self):
         for acad in self.mesDatas["academies"]:
             self.ui.cBAcademie.addItem(acad["nom"])
+            print(acad["nom"])
+
+    def ajoutAcademie (self):
+        print("Ajout Académie")
+
+        retour = QInputDialog().getText(self, "Ajout Académie", "Nom")
+        if retour[0] == "":
+            return
+        fiche = {}
+        fiche["nom"] = retour[0]
+        fiche["etablissements"]=""
+        self.mesDatas["academies"].append(fiche)
+        print(fiche)
+
+        self.ui.cBAcademie.addItem(fiche["nom"])
+        self.sauveJSON(filename)
+
+    def ajoutEtablissement(self):
+        print("Ajout Etablissement")
+
+    def sauveJSON (self, filename):
+        jsonClasse=json.dumps(self.mesDatas, sort_keys=True, indent=2)
+        f=open(filename, 'w')
+        f.write(jsonClasse)
 
     def updateEtablissement(self):
         self.ui.cBEtablissement.clear()
         academie = self.ui.cBAcademie.currentIndex()
         for etab in self.mesDatas["academies"][academie]["etablissements"]:
             self.ui.cBEtablissement.addItem(etab["nom"])
+            print(etab["nom"])
 
     def updateClasse(self):
         self.ui.cBClasse.clear()
@@ -69,17 +98,26 @@ class MainWindow(QMainWindow):
         listeMatieresUniques = np.unique(listeMatieres)
         self.ui.cBMatiereGBNote.addItems(listeMatieresUniques)
 
-    def ajoutNoteDevoir(self):
-        print("Ajouter devoir")
-        # academie = self.ui.cBAcademie.currentIndex()
-        # etabliss = self.ui.cBEtablissement.currentIndex()
-        # cla = self.ui.cBClasseGPNote.currentIndex()
-        # dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
-        # for eleve in dicoClasse["eleves"]:
-        #     for matiere in eleve["matieres"]:
-        #         mat = self.ui.cBMatiereGBNote.currentText()
-        #         if matiere["nom"] == mat:
-        #             nomE = eleve["nom"]
+    def ajoutNote(self):
+        print("Ajouter Note")
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasseGPNote.currentIndex()
+        dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        for eleve in dicoClasse["eleves"]:
+            for matiere in eleve["matieres"]:
+                mat = self.ui.cBMatiereGBNote.currentText()
+                if matiere["nom"] == mat:
+                    nomE = eleve["nom"]
+                    print(nomE)
+                    dicoM = matiere["nom"]
+                    print(dicoM)
+                    dicoDevoir=matiere["notes"]
+                    print (dicoDevoir)
+                    newDevoir={}
+                    newDevoir["nom"]=self.ui.lENomNote.text()
+                    print(newDevoir)
+                    self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][nomE]["matieres"][mat]["notes"].append(newDevoir)
 
 
     def updateSaisieEleve(self):

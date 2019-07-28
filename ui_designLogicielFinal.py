@@ -322,4 +322,3 @@ class Ui_MainWindow(object):
 #        self.tWBulletin.horizontalHeaderItem(5).setText(QtWidgets.QApplication.translate("MainWindow", "Appréciation", None, -1))
         self.label_12.setText(QtWidgets.QApplication.translate("MainWindow", "Moyennes", None, -1))
         self.labGraphRadar.setText(QtWidgets.QApplication.translate("MainWindow", "Graphique", None, -1))
-
