@@ -104,20 +104,42 @@ class MainWindow(QMainWindow):
         etabliss = self.ui.cBEtablissement.currentIndex()
         cla = self.ui.cBClasseGPNote.currentIndex()
         dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
-        for eleve in dicoClasse["eleves"]:
-            for matiere in eleve["matieres"]:
-                mat = self.ui.cBMatiereGBNote.currentText()
-                if matiere["nom"] == mat:
-                    nomE = eleve["nom"]
-                    print(nomE)
-                    dicoM = matiere["nom"]
-                    print(dicoM)
-                    dicoDevoir=matiere["notes"]
-                    print (dicoDevoir)
-                    newDevoir={}
-                    newDevoir["nom"]=self.ui.lENomNote.text()
-                    print(newDevoir)
-                    self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][nomE]["matieres"][mat]["notes"].append(newDevoir)
+        dicoEleves= dicoClasse["eleves"]
+        print (dicoEleves)
+        n = self.ui.tWTableNotation.rowCount()
+        for i in range(0, n):
+            mat = self.ui.cBMatiereGBNote.currentText()
+            eleveTw = self.ui.tWTableNotation.item(i, 0).text()
+            spinB = self.ui.tWTableNotation.cellWidget(i, 1)
+            note = spinB.value()
+            nomDevoir = self.ui.lENomNote.text()
+            coeff =  float(self.ui.lECoeffNote.text())
+            for eleves in dicoEleves:
+                if eleves["nom"] == eleveTw:
+                    for matiere in eleves["matieres"]:
+                        if matiere["nom"] == mat:
+                            print(eleves["nom"], matiere["nom"], 'devoir:', nomDevoir, 'coeff:', coeff, 'note:', note)
+                            ajoutNotes = matiere["notes"]
+                            ajoutNotes.append({"nom": nomDevoir, "coefficient": coeff, "valeur": note})
+                            print(ajoutNotes)
+                            self.sauveJSON(filename)
+                            
+        # for eleve in dicoClasse["eleves"]:
+        #     for matiere in eleve["matieres"]:
+        #         mat = self.ui.cBMatiereGBNote.currentText()
+        #         if matiere["nom"] == mat:
+        #             nomE = eleve["nom"]
+        #             print(nomE)
+        #             dicoM = matiere["nom"]
+        #             print(dicoM)
+        #             dicoDevoir=matiere["notes"]
+        #             print (dicoDevoir)
+        #             newDevoir={}
+        #             newDevoir["nom"]=self.ui.lENomNote.text()
+        #             newDevoir["coef"]=float(self.ui.lECoeffNote.text())
+        #             newDevoir["valeur"]=15.0
+        #             print(newDevoir)
+        #             self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][nomE]["matieres"][mat]["notes"].append(newDevoir)
 
 
     def updateSaisieEleve(self):
