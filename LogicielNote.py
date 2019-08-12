@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
                             ajoutNotes.append({"nom": nomDevoir, "coefficient": coeff, "valeur": note})
                             print(ajoutNotes)
                             self.sauveJSON(filename)
-                            
+
         # for eleve in dicoClasse["eleves"]:
         #     for matiere in eleve["matieres"]:
         #         mat = self.ui.cBMatiereGBNote.currentText()

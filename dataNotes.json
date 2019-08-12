@@ -32,6 +32,11 @@
                           "coefficient": 2.0,
                           "nom": "DST n3",
                           "valeur": 10.0
+                        },
+                        {
+                          "coefficient": 2.5,
+                          "nom": "tarte",
+                          "valeur": 15.0
                         }
                       ]
                     },
@@ -79,6 +84,11 @@
                           "coefficient": 2.0,
                           "nom": "DST n3",
                           "valeur": 15.0
+                        },
+                        {
+                          "coefficient": 2.5,
+                          "nom": "tarte",
+                          "valeur": 11.0
                         }
                       ]
                     },
@@ -126,6 +136,11 @@
                           "coefficient": 2.0,
                           "nom": "DST n3",
                           "valeur": 11.0
+                        },
+                        {
+                          "coefficient": 2.5,
+                          "nom": "tarte",
+                          "valeur": 16.0
                         }
                       ]
                     },
