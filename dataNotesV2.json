@@ -29,12 +29,12 @@
                           "valeur": 12.0
                         },
                         {
-                          "coefficient": 2.0,
+                          "coef": 2.0,
                           "nom": "DST n3",
                           "valeur": 10.0
                         },
                         {
-                          "coefficient": 2.5,
+                          "coef": 2.5,
                           "nom": "tarte",
                           "valeur": 15.0
                         }
@@ -65,33 +65,6 @@
                   "adresse": "32 rue du Paon, 31500 Muret",
                   "appreciationPP": "Eleve parfait",
                   "matieres": [
-                    {
-                      "appreciation": "Dynamique et investie",
-                      "coef": 4.0,
-                      "nom": "Physiologie",
-                      "notes": [
-                        {
-                          "coef": 2.0,
-                          "nom": "DST Physio n1",
-                          "valeur": 15.0
-                        },
-                        {
-                          "coef": 2.0,
-                          "nom": "DST Physio n2",
-                          "valeur": 12.0
-                        },
-                        {
-                          "coefficient": 2.0,
-                          "nom": "DST n3",
-                          "valeur": 15.0
-                        },
-                        {
-                          "coefficient": 2.5,
-                          "nom": "tarte",
-                          "valeur": 11.0
-                        }
-                      ]
-                    },
                     {
                       "appreciation": "Dynamique et investie",
                       "coef": 4.0,
@@ -133,12 +106,12 @@
                           "valeur": 15.0
                         },
                         {
-                          "coefficient": 2.0,
+                          "coef": 2.0,
                           "nom": "DST n3",
                           "valeur": 11.0
                         },
                         {
-                          "coefficient": 2.5,
+                          "coef": 2.5,
                           "nom": "tarte",
                           "valeur": 16.0
                         }
