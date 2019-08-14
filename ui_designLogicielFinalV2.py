@@ -488,3 +488,4 @@ class Ui_MainWindow(object):
         self.pBAjoutEleve.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvel Elève", None, -1))
         self.pBAjoutMatiere.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvelle Matière", None, -1))
 
+
