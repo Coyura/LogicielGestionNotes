@@ -2,6 +2,12 @@ import sys, json
 from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 # from PySide2.QtGui import QPixmap
 import numpy as np
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.path import Path
+from matplotlib.spines import Spine
+from matplotlib.projections.polar import PolarAxes
+from matplotlib.projections import register_projection
 # import matplotlib.pyplot as plt
 # from io import BytesIO
 # import base64
@@ -28,7 +34,7 @@ class MainWindow(QMainWindow):
         self.ui.cBEtablissement.currentIndexChanged.connect(self.updateClasse)
 
         self.ui.cBClasse.currentIndexChanged.connect(self.updateMatiere)
-        self.ui.cBClasseGPNote.currentIndexChanged.connect(self.updateMatiere)
+        ## self.ui.cBClasseGPNote.currentIndexChanged.connect(self.updateMatiere)
         self.ui.cBMatiereGBNote.currentIndexChanged.connect(self.updateSaisieEleve)
 
         # Ajout d'un nouveau Devoir/Note:
@@ -49,8 +55,14 @@ class MainWindow(QMainWindow):
         self.ui.cBListEtabEleve.currentIndexChanged.connect(self.updateClasseEleve)
         self.ui.pBValNewEleve.clicked.connect(self.ajoutEleve)
 
+        # Calcul Moyennes Eleve
+        self.ui.cBEleveBulletin.currentIndexChanged.connect(self.calculMoyenne)
+
         # Il faut charger les académies dans la comboBox:
         self.updateAcademie()
+
+        # Chargement de la liste des élèves d'une matière pour bulletin
+        self.ui.cBClasse.currentIndexChanged.connect(self.updateEleveBulletin)
 
     def updateAcademie (self):
         for acad in self.mesDatas["academies"]:
@@ -69,24 +81,24 @@ class MainWindow(QMainWindow):
             self.ui.cBEtablissement.addItem(etab["nom"])
             # self.ui.cBListEtabClass.addItem(etab["nom"])
             # self.ui.cBListEtabEleve.addItem(etab["nom"])
-
             print(etab["nom"])
 
     def updateClasse(self):
         self.ui.cBClasse.clear()
-        self.ui.cBClasseGPNote.clear()
-        # self.ui.cBClasseGPNote.clear()
+        ## self.ui.cBClasseGPNote.clear()
+        ## self.ui.cBClasseGPNote.clear()
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
         for cla in self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"]:
             self.ui.cBClasse.addItem(cla["nom"])
-            self.ui.cBClasseGPNote.addItem(cla["nom"])
+            ## self.ui.cBClasseGPNote.addItem(cla["nom"])
 
     def updateMatiere (self) :
         self.ui.cBMatiereGBNote.clear()
+        self.ui.cBMatiereBulletin.clear()
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
-        cla = self.ui.cBClasseGPNote.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
         listeMatieres = []
         dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
         for eleve in dicoClasse["eleves"]:
@@ -94,6 +106,7 @@ class MainWindow(QMainWindow):
                 listeMatieres.append(matiere["nom"])
         listeMatieresUniques = np.unique(listeMatieres)
         self.ui.cBMatiereGBNote.addItems(listeMatieresUniques)
+        self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
 
     def ajoutAcademie (self):
         print("Ajout Académie")
@@ -133,29 +146,30 @@ class MainWindow(QMainWindow):
         ficheC = {}
         academie = self.ui.cBListAcadClass.currentIndex()
         etab = self.ui.cBListEtabClass.currentIndex()
-        dicoClasse=self.mesDatas["academies"][academie]["etablissements"][etab]
+        dicoClasse=self.mesDatas["academies"][academie]["etablissements"][etab]["classes"]
         ficheC["nom"]=self.ui.lENomClasse.text()
         dicoClasse.append(ficheC)
         self.sauveJSON(filename)
         print(ficheE)
-
-    def ajoutEleve(self):
-        print("Ajout Etablissement")
-        # ficheE = {}
-        # academie = self.ui.cBListAcad.currentIndex()
-        # dicoEtab=self.mesDatas["academies"][academie]["etablissements"]
-        # ficheE["nom"]=self.ui.lENomEtab.text()
-        # dicoEtab.append(ficheE)
-        # self.sauveJSON(filename)
-        # print(ficheE)
-        #
-        # self.ui.cBEtablissement.addItem(ficheE["nom"])
 
     def updateEtabAjoutClasse (self):
         self.ui.cBListEtabClass.clear()
         academie = self.ui.cBListAcadClass.currentIndex()
         for etab in self.mesDatas["academies"][academie]["etablissements"]:
             self.ui.cBListEtabClass.addItem(etab["nom"])
+
+    def ajoutEleve(self):
+        print("Ajout Elève")
+        ficheE = {}
+        academie = self.ui.cBListAcad.currentIndex()
+        etab=self.ui.cBListEtabEleve.currentIndex()
+        cla=self.ui.cBListClassEleve.currentIndex()
+        dicoEleve=self.mesDatas["academies"][academie]["etablissements"][etab]["classes"][cla]["eleves"]
+        ficheE["nom"]=self.ui.lENomEleve.text()
+        # ficheE["prenom"]=self.ui.lEPrenomEleve.text()
+        dicoEleve.append(ficheE)
+        self.sauveJSON(filename)
+        print(ficheE)
 
     def updateEtabAjoutEleve (self):
         self.ui.cBListEtabEleve.clear()
@@ -170,36 +184,40 @@ class MainWindow(QMainWindow):
         for cla in self.mesDatas["academies"][academie]["etablissements"][etab]["classes"]:
             self.ui.cBListClassEleve.addItem(cla["nom"])
 
-
     def updateSaisieEleve(self):
+        print ("prout")
         cpt=0
         self.ui.tWTableNotation.clear()
-        # self.ui.tWTableNotation.setColumnCount(2)
+        self.ui.tWTableNotation.setColumnCount(3)
         # ça permettait de définir le nombre de colonne de la tableWidget si non défini dans le QtDesigner
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
-        cla = self.ui.cBClasseGPNote.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
         dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
         for eleve in dicoClasse["eleves"]:
             for matiere in eleve["matieres"]:
                 mat=self.ui.cBMatiereGBNote.currentText()
                 if matiere["nom"]==mat:
                     nomE = eleve["nom"]
+                    prenomE = eleve["prenom"]
                     self.ui.tWTableNotation.setRowCount(cpt+1)
                     itemE=QTableWidgetItem(nomE)
+                    itemPE=QTableWidgetItem(prenomE)
                     self.ui.tWTableNotation.setItem(cpt,0,itemE)
+                    self.ui.tWTableNotation.setItem(cpt,1, itemPE)
                     # utiliser le QDoubleSpin permet de rentrer une note en transformant direct en float
                     spinB=QDoubleSpinBox()
                     spinB.setProperty("nom", nomE)
-                    self.ui.tWTableNotation.setCellWidget(cpt,1, spinB)
+                    spinB.setProperty("prenom", prenomE)
+                    self.ui.tWTableNotation.setCellWidget(cpt,2, spinB)
                     cpt += 1
-        self.ui.tWTableNotation.setHorizontalHeaderLabels(['Nom', 'Note'])
+        self.ui.tWTableNotation.setHorizontalHeaderLabels(['Nom', 'Prénom', 'Note'])
 
     def ajoutNote(self):
         print("Ajouter Note")
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
-        cla = self.ui.cBClasseGPNote.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
         dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
         dicoEleves= dicoClasse["eleves"]
         print (dicoEleves)
@@ -217,9 +235,44 @@ class MainWindow(QMainWindow):
                         if matiere["nom"] == mat:
                             print(eleves["nom"], matiere["nom"], 'devoir:', nomDevoir, 'coeff:', coeff, 'note:', note)
                             ajoutNotes = matiere["notes"]
-                            ajoutNotes.append({"nom": nomDevoir, "coefficient": coeff, "valeur": note})
+                            ajoutNotes.append({"nom": nomDevoir, "coef": coeff, "valeur": note})
                             print(ajoutNotes)
                             self.sauveJSON(filename)
+
+    def updateEleveBulletin (self):
+        self.ui.cBEleveBulletin.clear()
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        for elev in self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"]:
+            self.ui.cBEleveBulletin.addItem(elev["nom"])
+
+    def calculMoyenne (self):
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        eleve=self.ui.cBEleveBulletin.currentIndex()
+        matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
+        # noteMatEleve = mesDatas["academies"][0]["etablissements"][0]["classes"][0]["eleves"][0]["matieres"][0]["notes"]
+        for m in matEleve:
+            notes = m["notes"]
+            sumCoef = 0
+            sumNotes = 0
+            for n in notes:
+                coefNote = n["coef"]
+                valeurNote = n["valeur"]
+                sumNotes = sumNotes + (coefNote * valeurNote)
+                sumCoef = sumCoef + coefNote
+                moyenneMat = sumNotes / sumCoef
+                print(m["nom"], moyenneMat)
+
+        # dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        # for eleve in dicoClasse["eleves"]:
+        #     for matiere in eleve["matieres"]:
+        #         mat = self.ui.cBMatiereBulletin.currentText()
+        #         if matiere["nom"] == mat:
+        #             nomE = eleve["nom"]
+        #             self.ui.cBEleveBulletin.addItem(nomE)
 
     def lireJSON(self, fileName):
         with open(fileName) as json_file:
@@ -239,13 +292,3 @@ if __name__ == "__main__":
     patate.show()
 
     sys.exit(app.exec_())
-
-
-# if __name__ == '__main__':
-#     # Create the Qt Application
-#     app = QApplication(sys.argv)
-#     # Create and show the form
-#     voy = Voyage()
-#     voy.show()
-#     # Run the main Qt loop
-#     sys.exit(app.exec_())
