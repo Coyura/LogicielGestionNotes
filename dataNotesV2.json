@@ -43,6 +43,33 @@
                     {
                       "appreciation": "Dynamique et investie",
                       "coef": 4.0,
+                      "nom": "Biochimie",
+                      "notes": [
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n1",
+                          "valeur": 18.0
+                        },
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n2",
+                          "valeur": 16.5
+                        },
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n3",
+                          "valeur": 14.0
+                        },
+                        {
+                          "coef": 2.5,
+                          "nom": "DST Bioch n4",
+                          "valeur": 16.0
+                        }
+                      ]
+                    },
+                    {
+                      "appreciation": "Dynamique et investie",
+                      "coef": 4.0,
                       "nom": "Physipathologie",
                       "notes": [
                         {
@@ -73,12 +100,12 @@
                         {
                           "coef": 2.0,
                           "nom": "DST PhysioPath n1",
-                          "valeur": 13.0
+                          "valeur": 17.0
                         },
                         {
                           "coef": 2.0,
                           "nom": "DST PhsyioPath n2",
-                          "valeur": 11.0
+                          "valeur": 18.0
                         }
                       ]
                     }
@@ -113,6 +140,33 @@
                         {
                           "coef": 2.5,
                           "nom": "tarte",
+                          "valeur": 16.0
+                        }
+                      ]
+                    },
+                    {
+                      "appreciation": "Dynamique et investie",
+                      "coef": 4.0,
+                      "nom": "Biochimie",
+                      "notes": [
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n1",
+                          "valeur": 8.0
+                        },
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n2",
+                          "valeur": 6.5
+                        },
+                        {
+                          "coef": 2.0,
+                          "nom": "DST Bioch n3",
+                          "valeur": 11.0
+                        },
+                        {
+                          "coef": 2.5,
+                          "nom": "DST Bioch n4",
                           "valeur": 16.0
                         }
                       ]
@@ -256,6 +310,31 @@
         }
       ],
       "nom": "Tarbes"
+    },
+    {
+      "etablissements": [
+        {
+          "adresse": "",
+          "classes": [
+            {
+              "PP": "Rouanet",
+              "anneeSco": "",
+              "eleves": [
+                {
+                  "adresse": "",
+                  "appreciationPP": "",
+                  "matieres": [],
+                  "nom": "Soumah",
+                  "prenom": "Aziz"
+                }
+              ],
+              "nom": "Compta1"
+            }
+          ],
+          "nom": "Iesca"
+        }
+      ],
+      "nom": "Castres"
     }
   ]
 }

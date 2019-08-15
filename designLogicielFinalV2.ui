@@ -292,7 +292,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="pBValCalculMoy">
             <property name="text">
              <string>Valider</string>
             </property>

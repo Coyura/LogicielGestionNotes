@@ -2,7 +2,9 @@ import sys, json
 from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 # from PySide2.QtGui import QPixmap
 import numpy as np
+import pandas as pd
 import numpy as np
+from math import pi
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 from matplotlib.spines import Spine
@@ -113,6 +115,7 @@ class MainWindow(QMainWindow):
         print("Ajout Académie")
         fiche = {}
         fiche["nom"]= self.ui.lENomAcad.text()
+        fiche["etablissements"]=[]
         self.mesDatas["academies"].append(fiche)
         self.sauveJSON(filename)
         print(fiche)
@@ -128,6 +131,8 @@ class MainWindow(QMainWindow):
         academie = self.ui.cBListAcad.currentIndex()
         dicoEtab=self.mesDatas["academies"][academie]["etablissements"]
         ficheE["nom"]=self.ui.lENomEtab.text()
+        ficheE["adresse"]=self.ui.lEEtabAdress.text()
+        ficheE["classes"]=[]
         dicoEtab.append(ficheE)
         self.sauveJSON(filename)
         print(ficheE)
@@ -143,9 +148,12 @@ class MainWindow(QMainWindow):
         etab = self.ui.cBListEtabClass.currentIndex()
         dicoClasse=self.mesDatas["academies"][academie]["etablissements"][etab]["classes"]
         ficheC["nom"]=self.ui.lENomClasse.text()
+        ficheC["anneeSco"]=self.ui.lEAnneScol.text()
+        ficheC["PP"]=self.ui.lEProfPrinc.text()
+        ficheC["eleves"]=[]
         dicoClasse.append(ficheC)
         self.sauveJSON(filename)
-        print(ficheE)
+        print(ficheC)
 
     def updateEtabAjoutClasse (self):
         self.ui.cBListEtabClass.clear()
@@ -161,7 +169,10 @@ class MainWindow(QMainWindow):
         cla=self.ui.cBListClassEleve.currentIndex()
         dicoEleve=self.mesDatas["academies"][academie]["etablissements"][etab]["classes"][cla]["eleves"]
         ficheE["nom"]=self.ui.lENomEleve.text()
-        # ficheE["prenom"]=self.ui.lEPrenomEleve.text()
+        ficheE["prenom"]=self.ui.lEPrenomEleve.text()
+        ficheE["adresse"]=""
+        ficheE["appreciationPP"]=""
+        ficheE["matieres"]=[]
         dicoEleve.append(ficheE)
         self.sauveJSON(filename)
         print(ficheE)
@@ -247,11 +258,12 @@ class MainWindow(QMainWindow):
         cla = self.ui.cBClasse.currentIndex()
         eleve=self.ui.cBEleveBulletin.currentIndex()
         matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
-        # noteMatEleve = mesDatas["academies"][0]["etablissements"][0]["classes"][0]["eleves"][0]["matieres"][0]["notes"]
-        listeMat = []
-        listeNotes = []
+        listeMatEl = []
+        listeNotesEl = []
+        dfra = {'Nom': ['Eleve', 'Classe']}
         for m in matEleve:
             notes = m["notes"]
+            nomMat = m["nom"]
             sumCoef = 0
             sumNotes = 0
             for n in notes:
@@ -259,19 +271,84 @@ class MainWindow(QMainWindow):
                 valeurNote = n["valeur"]
                 sumNotes = sumNotes + (coefNote * valeurNote)
                 sumCoef = sumCoef + coefNote
-            moyenneMat = sumNotes / sumCoef
-            listeNotes.append(moyenneMat)
-            listeMat.append(m["nom"])
-            print(m["nom"], moyenneMat)
-        print(listeMat, listeNotes)
+                moyEleMat = sumNotes / sumCoef
+            listeNotesEl.append(moyEleMat)
+            listeMatEl.append(nomMat)
+            print(m["nom"], moyEleMat)
+            dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+            listeMatCla = []
+            listeNotesCla = []
+            listMatUniqCla = []
+            nbElevMat = 0
+            for eleve in dicoClasse["eleves"]:
+                # print(eleve["nom"])
+                for matiere in eleve["matieres"]:
+                    mat = nomMat
+                    # print(matiere["nom"])
+                    if matiere["nom"] == mat:
+                        nbElevMat += 1
+                        notes = matiere["notes"]
+                        nomMat = matiere["nom"]
+                        sumCoef = 0
+                        sumNotes = 0
+                        for n in notes:
+                            coefNote = n["coef"]
+                            valeurNote = n["valeur"]
+                            sumNotes = sumNotes + (coefNote * valeurNote)
+                            sumCoef = sumCoef + coefNote
+                            moyenneMat = sumNotes / sumCoef
+                        # print(nomMat, moyenneMat)
+                        listeNotesCla.append(moyenneMat)
+                        listeMatCla.append(nomMat)
+                        listUniMat = np.unique(listeMatCla)
+                        listMatUniqCla.append(listUniMat)
+                moyClassMat = (sum(listeNotesCla)) / nbElevMat
+            dfra.update({nomMat: [moyEleMat, moyClassMat]})
+        print(dfra)
 
-        # dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
-        # for eleve in dicoClasse["eleves"]:
-        #     for matiere in eleve["matieres"]:
-        #         mat = self.ui.cBMatiereBulletin.currentText()
-        #         if matiere["nom"] == mat:
-        #             nomE = eleve["nom"]
-        #             self.ui.cBEleveBulletin.addItem(nomE)
+        df = pd.DataFrame(dfra)
+        # ------- PART 1: Create background
+
+        # number of variable
+        categories = list(df)[1:]
+        N = len(categories)
+
+        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+        angles = [n / float(N) * 2 * pi for n in range(N)]
+        angles += angles[:1]
+
+        # Initialise the spider plot
+        ax = plt.subplot(111, polar=True)
+
+        # If you want the first axis to be on top:
+        ax.set_theta_offset(pi / 2)
+        ax.set_theta_direction(-1)
+
+        # Draw one axe per variable + add labels labels yet
+        plt.xticks(angles[:-1], categories)
+
+        # Draw ylabels
+        ax.set_rlabel_position(0)
+        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="grey", size=7)
+        plt.ylim(0, 20)
+
+        # ------- PART 2: Add plots
+        # Eleve
+        values = df.loc[0].drop('Nom').values.flatten().tolist()
+        values += values[:1]
+        ax.plot(angles, values, linewidth=1, linestyle='solid', color='blue', label="Elève")
+        ax.fill(angles, values, 'b', alpha=0.1)
+
+        # Classe
+        values = df.loc[1].drop('Nom').values.flatten().tolist()
+        values += values[:1]
+        ax.plot(angles, values, linewidth=1, linestyle='solid', color='red', label="Classe")
+        ax.fill(angles, values, 'r', alpha=0.1)
+
+        # Add legend
+        plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+
+        plt.show()
 
     def lireJSON(self, fileName):
         with open(fileName) as json_file:
