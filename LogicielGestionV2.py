@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
         self.ui.pBValNewEleve.clicked.connect(self.ajoutEleve)
 
         # Calcul Moyennes Eleve
-        self.ui.cBEleveBulletin.currentIndexChanged.connect(self.calculMoyenne)
+        self.ui.pBValCalculMoy.clicked.connect(self.calculMoyenne)
 
         # Il faut charger les académies dans la comboBox:
         self.updateAcademie()
@@ -73,6 +73,7 @@ class MainWindow(QMainWindow):
             print(acad["nom"])
 
     def updateEtablissement(self):
+        print("prout")
         self.ui.cBEtablissement.clear()
         # self.ui.cBListEtabClass.clear()
         # self.ui.cBListEtabEleve.clear()
@@ -106,17 +107,11 @@ class MainWindow(QMainWindow):
                 listeMatieres.append(matiere["nom"])
         listeMatieresUniques = np.unique(listeMatieres)
         self.ui.cBMatiereGBNote.addItems(listeMatieresUniques)
-        self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
+        # self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
 
     def ajoutAcademie (self):
         print("Ajout Académie")
-
-        # retour = QInputDialog().getText(self, "Ajout Académie", "Nom")
-        # if retour[0] == "":
-        #     return
         fiche = {}
-        # fiche["nom"] = retour[0]
-        # fiche["etablissements"]=""
         fiche["nom"]= self.ui.lENomAcad.text()
         self.mesDatas["academies"].append(fiche)
         self.sauveJSON(filename)
@@ -185,7 +180,6 @@ class MainWindow(QMainWindow):
             self.ui.cBListClassEleve.addItem(cla["nom"])
 
     def updateSaisieEleve(self):
-        print ("prout")
         cpt=0
         self.ui.tWTableNotation.clear()
         self.ui.tWTableNotation.setColumnCount(3)
@@ -254,6 +248,8 @@ class MainWindow(QMainWindow):
         eleve=self.ui.cBEleveBulletin.currentIndex()
         matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
         # noteMatEleve = mesDatas["academies"][0]["etablissements"][0]["classes"][0]["eleves"][0]["matieres"][0]["notes"]
+        listeMat = []
+        listeNotes = []
         for m in matEleve:
             notes = m["notes"]
             sumCoef = 0
@@ -263,8 +259,11 @@ class MainWindow(QMainWindow):
                 valeurNote = n["valeur"]
                 sumNotes = sumNotes + (coefNote * valeurNote)
                 sumCoef = sumCoef + coefNote
-                moyenneMat = sumNotes / sumCoef
-                print(m["nom"], moyenneMat)
+            moyenneMat = sumNotes / sumCoef
+            listeNotes.append(moyenneMat)
+            listeMat.append(m["nom"])
+            print(m["nom"], moyenneMat)
+        print(listeMat, listeNotes)
 
         # dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
         # for eleve in dicoClasse["eleves"]:
