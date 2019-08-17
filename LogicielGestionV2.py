@@ -1,5 +1,5 @@
 import sys, json
-from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
+from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 # from PySide2.QtGui import QPixmap
 import numpy as np
 import pandas as pd
@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
         ## self.ui.cBClasseGPNote.currentIndexChanged.connect(self.updateMatiere)
         self.ui.cBMatiereGBNote.currentIndexChanged.connect(self.updateSaisieEleve)
 
+
         # Ajout d'un nouveau Devoir/Note:
         self.ui.pBValiderNotation.clicked.connect(self.ajoutNote)
 
@@ -58,6 +59,7 @@ class MainWindow(QMainWindow):
         self.ui.pBValNewEleve.clicked.connect(self.ajoutEleve)
 
         # Calcul Moyennes Eleve
+        self.ui.pBValAppr.clicked.connect(self.updateApprecia)
         self.ui.pBValCalculMoy.clicked.connect(self.calculMoyenne)
 
         # Il faut charger les académies dans la comboBox:
@@ -116,6 +118,8 @@ class MainWindow(QMainWindow):
         fiche = {}
         fiche["nom"]= self.ui.lENomAcad.text()
         fiche["etablissements"]=[]
+        # [{"nom":str(), "adresse":str(),"classes":[{"nom":str(), "anneeSco":str(), "PP":str(), "eleves":[{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[{"nom":str(), "coef" : float(), "appreciation":str(), "notes": []}]}]}]}]
+        # {"nom": str(), "anneeSco": str(), "PP": str(), "eleves": [{"nom": str(), "prenom": str(), "adresse": str(),"appreciationPP": str(), "matieres": [{"nom": str(), "coef": float(), "appreciation": str(), "notes": []}]}]}
         self.mesDatas["academies"].append(fiche)
         self.sauveJSON(filename)
         print(fiche)
@@ -133,13 +137,14 @@ class MainWindow(QMainWindow):
         ficheE["nom"]=self.ui.lENomEtab.text()
         ficheE["adresse"]=self.ui.lEEtabAdress.text()
         ficheE["classes"]=[]
+        # [{"nom":str(), "anneeSco":str(), "PP":str(), "eleves":[{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[]}]}]
         dicoEtab.append(ficheE)
         self.sauveJSON(filename)
         print(ficheE)
 
         self.ui.cBEtablissement.addItem(ficheE["nom"])
         # self.ui.cBListEtabClass.addItem(ficheE["nom"])
-        # self.ui.cBListEtabEleve.addItem(ficheE["nom"])
+        # self.ui.cBListEtabEleve.addItem(ficheE["nom" ])
 
     def ajoutClasse(self):
         print("Ajout Classe")
@@ -151,6 +156,7 @@ class MainWindow(QMainWindow):
         ficheC["anneeSco"]=self.ui.lEAnneScol.text()
         ficheC["PP"]=self.ui.lEProfPrinc.text()
         ficheC["eleves"]=[]
+        # [{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[{"nom":str(), "coef" : float(), "appreciation":str(), "notes": []}]}]
         dicoClasse.append(ficheC)
         self.sauveJSON(filename)
         print(ficheC)
@@ -252,6 +258,29 @@ class MainWindow(QMainWindow):
         for elev in self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"]:
             self.ui.cBEleveBulletin.addItem(elev["nom"])
 
+    def updateApprecia(self):
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        dicoEleves = dicoClasse["eleves"]
+        eleveTw = self.ui.cBEleveBulletin.currentIndex()
+        dicoMat=dicoClasse["eleves"][eleveTw]["matieres"]
+        print(dicoMat)
+        n = self.ui.tWBulletin.rowCount()
+        for i in range(0, n):
+            matTw=self.ui.tWBulletin.item(i, 0).text()
+            labelApp=self.ui.tWBulletin.cellWidget(i, 3)
+            appreciation=labelApp.text()
+            print(matTw)
+            for matiere in dicoMat:
+                if matiere["nom"] == matTw:
+                    matiere["appreciation"]=appreciation
+                    print('ok')
+                    self.sauveJSON(filename)
+
+
+
     def calculMoyenne (self):
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
@@ -274,6 +303,7 @@ class MainWindow(QMainWindow):
                 moyEleMat = sumNotes / sumCoef
             listeNotesEl.append(moyEleMat)
             listeMatEl.append(nomMat)
+            # listeMatNotEle = {"nom":}
             print(m["nom"], moyEleMat)
             dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
             listeMatCla = []
@@ -305,7 +335,32 @@ class MainWindow(QMainWindow):
                 moyClassMat = (sum(listeNotesCla)) / nbElevMat
             dfra.update({nomMat: [moyEleMat, moyClassMat]})
         print(dfra)
+        # def updateBulletin(self):
+        cpt = 0
+        self.ui.tWBulletin.clear()
+        self.ui.tWBulletin.setColumnCount(4)
+        self.ui.tWBulletin.setHorizontalHeaderLabels(['Matière', 'Moy Elève', 'Moy Classe', 'Appréciation'])
+        # academie = self.ui.cBAcademie.currentIndex()
+        # etabliss = self.ui.cBEtablissement.currentIndex()
+        # cla = self.ui.cBClasse.currentIndex()
+        elev = self.ui.cBEleveBulletin.currentIndex()
+        dicoElev = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][elev]
+        for matiere in dicoElev["matieres"]:
+            nomMatiere = matiere["nom"]
+            moyElev = str(dfra[nomMatiere][0])
+            moyClass = str(dfra[nomMatiere][1])
+            self.ui.tWBulletin.setRowCount(cpt + 1)
+            itemM = QTableWidgetItem(nomMatiere)
+            itemMoyE = QTableWidgetItem(moyElev)
+            itemMoyC = QTableWidgetItem(moyClass)
+            apprec = QLineEdit()
+            self.ui.tWBulletin.setItem(cpt, 0, itemM)
+            self.ui.tWBulletin.setItem(cpt, 1, itemMoyE)
+            self.ui.tWBulletin.setItem(cpt, 2, itemMoyC)
+            self.ui.tWBulletin.setCellWidget(cpt, 3, apprec)
+            cpt += 1
 
+        # Prod graphique mpyennes
         df = pd.DataFrame(dfra)
         # ------- PART 1: Create background
 
@@ -329,7 +384,7 @@ class MainWindow(QMainWindow):
 
         # Draw ylabels
         ax.set_rlabel_position(0)
-        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="grey", size=7)
+        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="#8A2BE2", size=7)
         plt.ylim(0, 20)
 
         # ------- PART 2: Add plots

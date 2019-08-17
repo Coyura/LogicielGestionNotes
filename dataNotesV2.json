@@ -118,7 +118,7 @@
                   "appreciationPP": "Eleve serieuse",
                   "matieres": [
                     {
-                      "appreciation": "Dynamique et investie",
+                      "appreciation": "TBIEN",
                       "coef": 4.0,
                       "nom": "Physiologie",
                       "notes": [
@@ -145,7 +145,7 @@
                       ]
                     },
                     {
-                      "appreciation": "Dynamique et investie",
+                      "appreciation": "Peut mieux faire",
                       "coef": 4.0,
                       "nom": "Biochimie",
                       "notes": [
@@ -172,7 +172,7 @@
                       ]
                     },
                     {
-                      "appreciation": "Dynamique et investie",
+                      "appreciation": "Top",
                       "coef": 4.0,
                       "nom": "Physipathologie",
                       "notes": [
