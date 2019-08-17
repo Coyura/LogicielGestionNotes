@@ -250,7 +250,7 @@
           <item>
            <widget class="QLabel" name="label_13">
             <property name="text">
-             <string>Matère :</string>
+             <string>(Matière) :</string>
             </property>
            </widget>
           </item>
@@ -316,28 +316,42 @@
        </layout>
       </item>
       <item>
-       <widget class="QTableWidget" name="tWBulletin">
-        <column>
-         <property name="text">
-          <string>Matière</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Nom - Prénom </string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Moy Elève</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Appréciation</string>
-         </property>
-        </column>
-       </widget>
+       <widget class="QTableWidget" name="tWBulletin"/>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_17">
+        <item>
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Valider Appréciations Bulletin :</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QPushButton" name="pBValAppr">
+            <property name="text">
+             <string>Valider</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QLabel" name="label_12">
@@ -446,6 +460,12 @@
      <layout class="QVBoxLayout" name="verticalLayout_13">
       <item>
        <widget class="QLabel" name="label_7">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
         <property name="text">
          <string>Choisir Académie :</string>
         </property>
@@ -824,6 +844,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pBAjoutAcademie">
+           <property name="autoFillBackground">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Nouvelle Académie</string>
            </property>
