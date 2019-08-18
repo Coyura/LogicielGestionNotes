@@ -13,7 +13,7 @@ from matplotlib.projections import register_projection
 # import matplotlib.pyplot as plt
 # from io import BytesIO
 # import base64
-from ui_designLogicielFinalV2 import Ui_MainWindow
+from ui_designLogicielFinalV3 import Ui_MainWindow
 
 filename = "dataNotesV2.json"
 
@@ -28,6 +28,21 @@ class MainWindow(QMainWindow):
         self.mesDatas = {}
 
         self.mesDatas = self.lireJSON(filename)
+
+        #Hide and show the differents windows:
+        self.ui.pBGestNote.clicked.connect(self.showGestionNotes)
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+        self.ui.pBMoyenne.clicked.connect(self.showBulletin)
+        self.ui.pBAjoutAcademie.clicked.connect(self.showAjoutAcad)
+        self.ui.pBAjoutEtablissement.clicked.connect(self.showAjoutEtab)
+        self.ui.pBAjoutClasse.clicked.connect(self.showAjoutClasse)
+        self.ui.pBAjoutEleve.clicked.connect(self.showAjoutEleve)
+        self.ui.pBAjoutMatiere.clicked.connect(self.showAjoutMat)
 
         # Il faut maintenant charger les établissements de l'académie choisie :
         self.ui.cBAcademie.currentIndexChanged.connect(self.updateEtablissement)
@@ -58,6 +73,12 @@ class MainWindow(QMainWindow):
         self.ui.cBListEtabEleve.currentIndexChanged.connect(self.updateClasseEleve)
         self.ui.pBValNewEleve.clicked.connect(self.ajoutEleve)
 
+        # Ajout Matière
+        self.ui.cBAcadMat.currentIndexChanged.connect(self.updateEtabAjoutMat)
+        self.ui.cBEtabMat.currentIndexChanged.connect(self.updateClassAjoutMat)
+        self.ui.cBClassMat.currentIndexChanged.connect(self.updateElevAjoutMat)
+        self.ui.pBValMat.clicked.connect(self.ajoutMatière)
+
         # Calcul Moyennes Eleve
         self.ui.pBValAppr.clicked.connect(self.updateApprecia)
         self.ui.pBValCalculMoy.clicked.connect(self.calculMoyenne)
@@ -68,12 +89,76 @@ class MainWindow(QMainWindow):
         # Chargement de la liste des élèves d'une matière pour bulletin
         self.ui.cBClasse.currentIndexChanged.connect(self.updateEleveBulletin)
 
+    def showGestionNotes(self):
+        self.ui.gBGestionNotes.setVisible(True)
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showBulletin(self):
+        self.ui.gBMoyBulletin.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showAjoutAcad(self):
+        self.ui.gBAjoutAcad.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showAjoutEtab(self):
+        self.ui.gBAjoutEtab.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showAjoutClasse(self):
+        self.ui.gBAjoutClasse.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showAjoutEleve(self):
+        self.ui.gBAjoutEleve.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutMat.hide()
+
+    def showAjoutMat(self):
+        self.ui.gBAjoutMat.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+
     def updateAcademie (self):
         for acad in self.mesDatas["academies"]:
             self.ui.cBAcademie.addItem(acad["nom"])
             self.ui.cBListAcad.addItem(acad["nom"])
             self.ui.cBListAcadClass.addItem(acad["nom"])
             self.ui.cBListAcadEleve.addItem(acad["nom"])
+            self.ui.cBAcadMat.addItem(acad["nom"])
             print(acad["nom"])
 
     def updateEtablissement(self):
@@ -100,7 +185,7 @@ class MainWindow(QMainWindow):
 
     def updateMatiere (self) :
         self.ui.cBMatiereGBNote.clear()
-        self.ui.cBMatiereBulletin.clear()
+        ## self.ui.cBMatiereBulletin.clear()
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
         cla = self.ui.cBClasse.currentIndex()
@@ -111,7 +196,7 @@ class MainWindow(QMainWindow):
                 listeMatieres.append(matiere["nom"])
         listeMatieresUniques = np.unique(listeMatieres)
         self.ui.cBMatiereGBNote.addItems(listeMatieresUniques)
-        # self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
+        ## self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
 
     def ajoutAcademie (self):
         print("Ajout Académie")
@@ -196,6 +281,43 @@ class MainWindow(QMainWindow):
         for cla in self.mesDatas["academies"][academie]["etablissements"][etab]["classes"]:
             self.ui.cBListClassEleve.addItem(cla["nom"])
 
+    def ajoutMatière(self):
+        print("Ajout Matière")
+        ficheM = {}
+        academie = self.ui.cBAcadMat.currentIndex()
+        etab = self.ui.cBEtabMat.currentIndex()
+        cla = self.ui.cBClassMat.currentIndex()
+        elev = self.ui.cBElevMat.currentIndex()
+        dicoMat = self.mesDatas["academies"][academie]["etablissements"][etab]["classes"][cla]["eleves"][elev]["matieres"]
+        ficheM["nom"] = self.ui.lENomMat.text()
+        ficheM["coef"] = self.ui.dSBCoeffMat.value()
+        ficheM["appreciation"] = ""
+        # ficheM["notes"] = [{"nom":str(),"coef":float(),"valeur":float()}]
+        ficheM["notes"]=[]
+        dicoMat.append(ficheM)
+        self.sauveJSON(filename)
+        print(ficheM)
+
+    def updateEtabAjoutMat(self):
+        academie = self.ui.cBAcadMat.currentIndex()
+        for etab in self.mesDatas["academies"][academie]["etablissements"]:
+            self.ui.cBEtabMat.addItem(etab["nom"])
+
+    def updateClassAjoutMat(self):
+        self.ui.cBClassMat.clear()
+        academie = self.ui.cBAcadMat.currentIndex()
+        etab = self.ui.cBEtabMat.currentIndex()
+        for cla in self.mesDatas["academies"][academie]["etablissements"][etab]["classes"]:
+            self.ui.cBClassMat.addItem(cla["nom"])
+
+    def updateElevAjoutMat(self):
+        self.ui.cBElevMat.clear()
+        academie = self.ui.cBAcadMat.currentIndex()
+        etab = self.ui.cBEtabMat.currentIndex()
+        cla = self.ui.cBClassMat.currentIndex()
+        for elev in self.mesDatas["academies"][academie]["etablissements"][etab]["classes"][cla]["eleves"]:
+            self.ui.cBElevMat.addItem(elev["nom"])
+
     def updateSaisieEleve(self):
         cpt=0
         self.ui.tWTableNotation.clear()
@@ -236,7 +358,7 @@ class MainWindow(QMainWindow):
         for i in range(0, n):
             mat = self.ui.cBMatiereGBNote.currentText()
             eleveTw = self.ui.tWTableNotation.item(i, 0).text()
-            spinB = self.ui.tWTableNotation.cellWidget(i, 1)
+            spinB = self.ui.tWTableNotation.cellWidget(i, 2)
             note = spinB.value()
             nomDevoir = self.ui.lENomNote.text()
             coeff =  float(self.ui.lECoeffNote.text())
@@ -244,7 +366,7 @@ class MainWindow(QMainWindow):
                 if eleves["nom"] == eleveTw:
                     for matiere in eleves["matieres"]:
                         if matiere["nom"] == mat:
-                            print(eleves["nom"], matiere["nom"], 'devoir:', nomDevoir, 'coeff:', coeff, 'note:', note)
+                            print(eleves["nom"], matiere["nom"], 'devoir:', nomDevoir, 'coef:', coeff, 'note:', note)
                             ajoutNotes = matiere["notes"]
                             ajoutNotes.append({"nom": nomDevoir, "coef": coeff, "valeur": note})
                             print(ajoutNotes)
@@ -263,7 +385,6 @@ class MainWindow(QMainWindow):
         etabliss = self.ui.cBEtablissement.currentIndex()
         cla = self.ui.cBClasse.currentIndex()
         dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
-        dicoEleves = dicoClasse["eleves"]
         eleveTw = self.ui.cBEleveBulletin.currentIndex()
         dicoMat=dicoClasse["eleves"][eleveTw]["matieres"]
         print(dicoMat)
@@ -276,10 +397,7 @@ class MainWindow(QMainWindow):
             for matiere in dicoMat:
                 if matiere["nom"] == matTw:
                     matiere["appreciation"]=appreciation
-                    print('ok')
                     self.sauveJSON(filename)
-
-
 
     def calculMoyenne (self):
         academie = self.ui.cBAcademie.currentIndex()
@@ -384,15 +502,15 @@ class MainWindow(QMainWindow):
 
         # Draw ylabels
         ax.set_rlabel_position(0)
-        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="#8A2BE2", size=7)
+        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="black", size=7)
         plt.ylim(0, 20)
 
         # ------- PART 2: Add plots
         # Eleve
         values = df.loc[0].drop('Nom').values.flatten().tolist()
         values += values[:1]
-        ax.plot(angles, values, linewidth=1, linestyle='solid', color='blue', label="Elève")
-        ax.fill(angles, values, 'b', alpha=0.1)
+        ax.plot(angles, values, linewidth=1, linestyle='solid', color='green', label="Elève")
+        ax.fill(angles, values, 'g', alpha=0.1)
 
         # Classe
         values = df.loc[1].drop('Nom').values.flatten().tolist()
@@ -403,7 +521,17 @@ class MainWindow(QMainWindow):
         # Add legend
         plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
 
-        plt.show()
+        # plt.show()
+        # plt.tight_layout()
+        plt.plot()
+        plt.savefig("RadarNotes.png", format='png')
+
+        self.ui.labGraphRadar.setPixmap("RadarNotes.png")
+        self.ui.labGraphRadar.setScaledContents(True)
+
+        # self.ui.labGraphRadar.resize(pixmap.width(), pixmap.height())
+
+        plt.clf()
 
     def lireJSON(self, fileName):
         with open(fileName) as json_file:
