@@ -1,5 +1,5 @@
 import sys, json
-from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
+from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QMessageBox, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 import pandas as pd
 import numpy as np
 from math import pi
@@ -21,19 +21,22 @@ class MainWindow(QMainWindow):
         self.mesDatas = self.lireJSON(filename)
 
         #Hide and show the differents windows:
-        self.ui.pBGestNote.clicked.connect(self.showGestionNotes)
         self.ui.gBMoyBulletin.hide()
         self.ui.gBAjoutAcad.hide()
         self.ui.gBAjoutEtab.hide()
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
+        self.ui.pBGestNote.clicked.connect(self.showGestionNotes)
         self.ui.pBMoyenne.clicked.connect(self.showBulletin)
         self.ui.pBAjoutAcademie.clicked.connect(self.showAjoutAcad)
         self.ui.pBAjoutEtablissement.clicked.connect(self.showAjoutEtab)
         self.ui.pBAjoutClasse.clicked.connect(self.showAjoutClasse)
         self.ui.pBAjoutEleve.clicked.connect(self.showAjoutEleve)
         self.ui.pBAjoutMatiere.clicked.connect(self.showAjoutMat)
+        self.ui.pBModifNotes.clicked.connect(self.showModifNote)
+
 
         # Il faut maintenant charger les établissements de l'académie choisie :
         self.ui.cBAcademie.currentIndexChanged.connect(self.updateEtablissement)
@@ -42,9 +45,10 @@ class MainWindow(QMainWindow):
         self.ui.cBEtablissement.currentIndexChanged.connect(self.updateClasse)
 
         self.ui.cBClasse.currentIndexChanged.connect(self.updateMatiere)
-        ## self.ui.cBClasseGPNote.currentIndexChanged.connect(self.updateMatiere)
         self.ui.cBMatiereGBNote.currentIndexChanged.connect(self.updateSaisieEleve)
-
+        self.ui.cBMatiereModifNote.currentIndexChanged.connect(self.updateDevoir)
+        self.ui.pBAffNote.clicked.connect(self.affichNote)
+        self.ui.pBValiderModifNote.clicked.connect(self.modifNote)
 
         # Ajout d'un nouveau Devoir/Note:
         self.ui.pBValiderNotation.clicked.connect(self.ajoutNote)
@@ -90,6 +94,17 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
+
+    def showModifNote(self):
+        self.ui.gBModifierNotes.setVisible(True)
+        self.ui.gBGestionNotes.hide()
+        self.ui.gBMoyBulletin.hide()
+        self.ui.gBAjoutAcad.hide()
+        self.ui.gBAjoutEtab.hide()
+        self.ui.gBAjoutClasse.hide()
+        self.ui.gBAjoutEleve.hide()
+        self.ui.gBAjoutMat.hide()
 
     def showBulletin(self):
         self.ui.gBMoyBulletin.setVisible(True)
@@ -99,6 +114,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
         self.updateEleveBulletin()
 
     def showAjoutAcad(self):
@@ -109,6 +125,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
 
     def showAjoutEtab(self):
         self.ui.gBAjoutEtab.setVisible(True)
@@ -118,6 +135,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
 
     def showAjoutClasse(self):
         self.ui.gBAjoutClasse.setVisible(True)
@@ -127,6 +145,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutEtab.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
 
     def showAjoutEleve(self):
         self.ui.gBAjoutEleve.setVisible(True)
@@ -136,6 +155,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutEtab.hide()
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutMat.hide()
+        self.ui.gBModifierNotes.hide()
 
     def showAjoutMat(self):
         self.ui.gBAjoutMat.setVisible(True)
@@ -145,6 +165,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutEtab.hide()
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
+        self.ui.gBModifierNotes.hide()
 
     def updateAcademie (self):
         for acad in self.mesDatas["academies"]:
@@ -190,7 +211,7 @@ class MainWindow(QMainWindow):
                 listeMatieres.append(matiere["nom"])
         listeMatieresUniques = np.unique(listeMatieres)
         self.ui.cBMatiereGBNote.addItems(listeMatieresUniques)
-        ## self.ui.cBMatiereBulletin.addItems(listeMatieresUniques)
+        self.ui.cBMatiereModifNote.addItems(listeMatieresUniques)
 
     def ajoutAcademie (self):
         print("Ajout Académie")
@@ -217,11 +238,20 @@ class MainWindow(QMainWindow):
         ficheE["nom"]=self.ui.lENomEtab.text()
         ficheE["adresse"]=self.ui.lEEtabAdress.text()
         ficheE["classes"]=[]
-        # [{"nom":str(), "anneeSco":str(), "PP":str(), "eleves":[{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[]}]}]
-        dicoEtab.append(ficheE)
-        self.sauveJSON(filename)
-        print(ficheE)
-
+        if self.ui.lENomEtab.text()=='':
+            msgErreur = QMessageBox()
+            msgErreur.setWindowTitle("Erreur")
+            msgErreur.setText("Le nom de l'établissement est manquant")
+            msgErreur.exec()
+        elif self.ui.lEEtabAdress.text()=='':
+            msgErreurAd = QMessageBox()
+            msgErreurAd.setWindowTitle("Erreur")
+            msgErreurAd.setText("L'adresse de l'établissement est manquante")
+            msgErreurAd.exec()
+        else:
+            dicoEtab.append(ficheE)
+            self.sauveJSON(filename)
+            print(ficheE)
         self.ui.cBEtablissement.addItem(ficheE["nom"])
         # self.ui.cBListEtabClass.addItem(ficheE["nom"])
         # self.ui.cBListEtabEleve.addItem(ficheE["nom" ])
@@ -293,6 +323,25 @@ class MainWindow(QMainWindow):
         self.sauveJSON(filename)
         print(ficheM)
 
+    def updateDevoir(self):
+        self.ui.cBListeDevoir.clear()
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        matNom=self.ui.cBMatiereModifNote.currentText()
+        # mat=self.ui.cBMatiereModifNote.currentIndex()
+        listeDevoir = []
+        dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        for eleve in dicoClasse["eleves"]:
+            # dicoMat=eleve["matieres"][mat]
+            for matiere in eleve["matieres"]:
+                if matiere["nom"]==matNom :
+                    dicoDevoir=matiere["notes"]
+                    for devoir in dicoDevoir:
+                        listeDevoir.append(devoir["nom"])
+        listeDevoirUniques = np.unique(listeDevoir)
+        self.ui.cBListeDevoir.addItems(listeDevoirUniques)
+
     def updateEtabAjoutMat(self):
         academie = self.ui.cBAcadMat.currentIndex()
         for etab in self.mesDatas["academies"][academie]["etablissements"]:
@@ -335,10 +384,12 @@ class MainWindow(QMainWindow):
                     self.ui.tWTableNotation.setItem(cpt,1, itemPE)
                     # utiliser le QDoubleSpin permet de rentrer une note en transformant direct en float
                     spinB=QDoubleSpinBox()
+                    self.ui.tWTableNotation.setCellWidget(cpt, 2, spinB)
+                    cpt += 1
+                    # Ci dessous cela permet de "cacher" des info dans la spinbox pour éviter d'aller les chercher dans toutes les cases du tableau
                     spinB.setProperty("nom", nomE)
                     spinB.setProperty("prenom", prenomE)
-                    self.ui.tWTableNotation.setCellWidget(cpt,2, spinB)
-                    cpt += 1
+
         self.ui.tWTableNotation.setHorizontalHeaderLabels(['Nom', 'Prénom', 'Note'])
 
     def ajoutNote(self):
@@ -356,7 +407,7 @@ class MainWindow(QMainWindow):
             spinB = self.ui.tWTableNotation.cellWidget(i, 2)
             note = spinB.value()
             nomDevoir = self.ui.lENomNote.text()
-            coeff =  float(self.ui.lECoeffNote.text())
+            coeff = self.ui.dSBCoeffNote.value()
             for eleves in dicoEleves:
                 if eleves["nom"] == eleveTw:
                     for matiere in eleves["matieres"]:
@@ -365,7 +416,79 @@ class MainWindow(QMainWindow):
                             ajoutNotes = matiere["notes"]
                             ajoutNotes.append({"nom": nomDevoir, "coef": coeff, "valeur": note})
                             print(ajoutNotes)
-                            self.sauveJSON(filename)
+        self.sauveJSON(filename)
+
+    def affichNote(self):
+        cpt = 0
+        self.ui.tWTableNoteModif.clear()
+        self.ui.tWTableNoteModif.setColumnCount(3)
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        for eleve in dicoClasse["eleves"]:
+            for matiere in eleve["matieres"]:
+                mat = self.ui.cBMatiereModifNote.currentText()
+                if matiere["nom"] == mat:
+                    dicoDevoir = matiere["notes"]
+                    for devoir in dicoDevoir:
+                        nomDevoir=self.ui.cBListeDevoir.currentText()
+                        if devoir["nom"]==nomDevoir :
+                            nomE = eleve["nom"]
+                            prenomE = eleve["prenom"]
+                            valNote=devoir["valeur"]
+                            coefNote=devoir["coef"]
+                            self.ui.dSBCoeffModifNote.setValue(coefNote)
+                            self.ui.tWTableNoteModif.setRowCount(cpt + 1)
+                            itemE = QTableWidgetItem(nomE)
+                            itemPE = QTableWidgetItem(prenomE)
+                            self.ui.tWTableNoteModif.setItem(cpt, 0, itemE)
+                            self.ui.tWTableNoteModif.setItem(cpt, 1, itemPE)
+                            spinB = QDoubleSpinBox()
+                            self.ui.tWTableNoteModif.setCellWidget(cpt, 2, spinB)
+                            spinB.setValue(valNote)
+                            cpt += 1
+        self.ui.tWTableNoteModif.setHorizontalHeaderLabels(['Nom', 'Prénom', 'Note'])
+
+    def modifNote(self):
+        print('A faire')
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        n = self.ui.tWTableNoteModif.rowCount()
+        for i in range(0, n):
+            mat = self.ui.cBMatiereModifNote.currentText()
+            eleveTw = self.ui.tWTableNoteModif.item(i, 0).text()
+            spinB = self.ui.tWTableNoteModif.cellWidget(i, 2)
+            note = spinB.value()
+            coeff = self.ui.dSBCoeffNote.value()
+            for eleve in dicoClasse["eleves"]:
+                if eleve["nom"] == eleveTw:
+                    for matiere in eleve["matieres"]:
+                        if matiere["nom"] == mat :
+                            dicoDevoir = matiere["notes"]
+                            for devoir in dicoDevoir:
+                                nomDevoir = self.ui.cBListeDevoir.currentText()
+                                if devoir["nom"] == nomDevoir:
+                                    devoir["valeur"]=note
+                                    devoir["coef"]=coeff
+            self.sauveJSON(filename)
+                            # valDevoir=self.ui.tWTableNoteModif
+
+        # academie = self.ui.cBAcademie.currentIndex()
+        # etabliss = self.ui.cBEtablissement.currentIndex()
+        # cla = self.ui.cBClasse.currentIndex()
+        # dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+        # dicoEleves = dicoClasse["eleves"]
+        # n = self.ui.tWTableNotation.rowCount()
+        # for i in range(0, n):
+        #     mat = self.ui.cBMatiereModifNote.currentText()
+        #     nomDevoir = self.ui.cBListeDevoir.currentText()
+        #     eleveTw = self.ui.tWTableNotation.item(i, 0).text()
+        #     spinB = self.ui.tWTableNotation.cellWidget(i, 2)
+        #     for eleves in dicoEleves:
+        #         if eleves["nom"] == eleveTw:
 
     def updateEleveBulletin (self):
         self.ui.cBEleveBulletin.clear()

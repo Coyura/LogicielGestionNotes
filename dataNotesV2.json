@@ -64,6 +64,11 @@
                           "coef": 2.5,
                           "nom": "DST Bioch n4",
                           "valeur": 16.0
+                        },
+                        {
+                          "coef": 3.0,
+                          "nom": "BTS Blanc",
+                          "valeur": 15.0
                         }
                       ]
                     },
@@ -202,6 +207,11 @@
                           "coef": 2.5,
                           "nom": "DST Bioch n4",
                           "valeur": 16.0
+                        },
+                        {
+                          "coef": 3.0,
+                          "nom": "BTS Blanc",
+                          "valeur": 10.0
                         }
                       ]
                     },
@@ -327,6 +337,11 @@
             }
           ],
           "nom": "Rose Carmin"
+        },
+        {
+          "adresse": "",
+          "classes": [],
+          "nom": "aa"
         }
       ],
       "nom": "Toulouse"
