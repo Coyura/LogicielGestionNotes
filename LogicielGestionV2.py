@@ -1,19 +1,10 @@
 import sys, json
 from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
-# from PySide2.QtGui import QPixmap
-import numpy as np
 import pandas as pd
 import numpy as np
 from math import pi
 import matplotlib.pyplot as plt
-from matplotlib.path import Path
-from matplotlib.spines import Spine
-from matplotlib.projections.polar import PolarAxes
-from matplotlib.projections import register_projection
-# import matplotlib.pyplot as plt
-# from io import BytesIO
-# import base64
-from ui_designLogicielFinalV3 import Ui_MainWindow
+from ui_designLogicielFinalV4 import Ui_MainWindow
 
 filename = "dataNotesV2.json"
 
@@ -89,6 +80,8 @@ class MainWindow(QMainWindow):
         # Chargement de la liste des élèves d'une matière pour bulletin
         self.ui.cBClasse.currentIndexChanged.connect(self.updateEleveBulletin)
 
+
+
     def showGestionNotes(self):
         self.ui.gBGestionNotes.setVisible(True)
         self.ui.gBMoyBulletin.hide()
@@ -106,6 +99,7 @@ class MainWindow(QMainWindow):
         self.ui.gBAjoutClasse.hide()
         self.ui.gBAjoutEleve.hide()
         self.ui.gBAjoutMat.hide()
+        self.updateEleveBulletin()
 
     def showAjoutAcad(self):
         self.ui.gBAjoutAcad.setVisible(True)
@@ -213,6 +207,7 @@ class MainWindow(QMainWindow):
         self.ui.cBListAcad.addItem(fiche["nom"])
         self.ui.cBListAcadClass.addItem(fiche["nom"])
         self.ui.cBListAcadEleve.addItem(fiche["nom"])
+        self.ui.cBAcadMat.addItem(fiche["nom"])
 
     def ajoutEtablissement(self):
         print("Ajout Etablissement")
@@ -465,8 +460,8 @@ class MainWindow(QMainWindow):
         dicoElev = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][elev]
         for matiere in dicoElev["matieres"]:
             nomMatiere = matiere["nom"]
-            moyElev = str(dfra[nomMatiere][0])
-            moyClass = str(dfra[nomMatiere][1])
+            moyElev = str(round(dfra[nomMatiere][0],2))
+            moyClass = str(round(dfra[nomMatiere][1],2))
             self.ui.tWBulletin.setRowCount(cpt + 1)
             itemM = QTableWidgetItem(nomMatiere)
             itemMoyE = QTableWidgetItem(moyElev)
@@ -509,7 +504,7 @@ class MainWindow(QMainWindow):
         # Eleve
         values = df.loc[0].drop('Nom').values.flatten().tolist()
         values += values[:1]
-        ax.plot(angles, values, linewidth=1, linestyle='solid', color='green', label="Elève")
+        ax.plot(angles, values, 'o-', linewidth=1, linestyle='solid', color='green', label="Elève")
         ax.fill(angles, values, 'g', alpha=0.1)
 
         # Classe
@@ -549,5 +544,6 @@ if __name__ == "__main__":
 
     patate = MainWindow()
     patate.show()
+    patate.resize(800,600)
 
     sys.exit(app.exec_())

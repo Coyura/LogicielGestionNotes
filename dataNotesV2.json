@@ -83,6 +83,23 @@
                           "valeur": 11.0
                         }
                       ]
+                    },
+                    {
+                      "appreciation": "",
+                      "coef": 4.0,
+                      "nom": "Cuisine TP",
+                      "notes": [
+                        {
+                          "coef": 2.0,
+                          "nom": "Cuisine n1",
+                          "valeur": 11.0
+                        },
+                        {
+                          "coef": 1.5,
+                          "nom": "Cuisine n2",
+                          "valeur": 10.0
+                        }
+                      ]
                     }
                   ],
                   "nom": "Alcher",
@@ -106,6 +123,23 @@
                           "coef": 2.0,
                           "nom": "DST PhsyioPath n2",
                           "valeur": 18.0
+                        }
+                      ]
+                    },
+                    {
+                      "appreciation": "",
+                      "coef": 4.0,
+                      "nom": "Cuisine TP",
+                      "notes": [
+                        {
+                          "coef": 2.0,
+                          "nom": "Cuisine n1",
+                          "valeur": 16.0
+                        },
+                        {
+                          "coef": 1.5,
+                          "nom": "Cuisine n2",
+                          "valeur": 17.0
                         }
                       ]
                     }
@@ -187,10 +221,34 @@
                           "valeur": 16.0
                         }
                       ]
+                    },
+                    {
+                      "appreciation": "",
+                      "coef": 4.0,
+                      "nom": "Cuisine TP",
+                      "notes": [
+                        {
+                          "coef": 2.0,
+                          "nom": "Cuisine n1",
+                          "valeur": 8.0
+                        },
+                        {
+                          "coef": 1.5,
+                          "nom": "Cuisine n2",
+                          "valeur": 6.0
+                        }
+                      ]
                     }
                   ],
                   "nom": "Duquenne",
                   "prenom": "Morganne"
+                },
+                {
+                  "adresse": "",
+                  "appreciationPP": "",
+                  "matieres": [],
+                  "nom": "Dantas",
+                  "prenom": "Viviane"
                 }
               ],
               "nom": "Diet2"
