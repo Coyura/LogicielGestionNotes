@@ -1,10 +1,12 @@
 import sys, json
-from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QMessageBox, QInputDialog, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
+from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QMessageBox, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
+from PySide2.QtGui import QPixmap
+from PySide2.QtCore import Qt
 import pandas as pd
 import numpy as np
 from math import pi
 import matplotlib.pyplot as plt
-from ui_designLogicielFinalV4 import Ui_MainWindow
+from ui_designLogicielFinalV5 import Ui_MainWindow
 
 filename = "dataNotesV2.json"
 
@@ -200,6 +202,7 @@ class MainWindow(QMainWindow):
 
     def updateMatiere (self) :
         self.ui.cBMatiereGBNote.clear()
+        self.ui.cBMatiereModifNote.clear()
         ## self.ui.cBMatiereBulletin.clear()
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
@@ -218,17 +221,20 @@ class MainWindow(QMainWindow):
         fiche = {}
         fiche["nom"]= self.ui.lENomAcad.text()
         fiche["etablissements"]=[]
-        # [{"nom":str(), "adresse":str(),"classes":[{"nom":str(), "anneeSco":str(), "PP":str(), "eleves":[{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[{"nom":str(), "coef" : float(), "appreciation":str(), "notes": []}]}]}]}]
-        # {"nom": str(), "anneeSco": str(), "PP": str(), "eleves": [{"nom": str(), "prenom": str(), "adresse": str(),"appreciationPP": str(), "matieres": [{"nom": str(), "coef": float(), "appreciation": str(), "notes": []}]}]}
-        self.mesDatas["academies"].append(fiche)
-        self.sauveJSON(filename)
-        print(fiche)
-
-        self.ui.cBAcademie.addItem(fiche["nom"])
-        self.ui.cBListAcad.addItem(fiche["nom"])
-        self.ui.cBListAcadClass.addItem(fiche["nom"])
-        self.ui.cBListAcadEleve.addItem(fiche["nom"])
-        self.ui.cBAcadMat.addItem(fiche["nom"])
+        if self.ui.lENomAcad.text()=='':
+            msgErreur = QMessageBox()
+            msgErreur.setWindowTitle("Erreur")
+            msgErreur.setText("Le nom de l'académie est manquant")
+            msgErreur.exec()
+        else:
+            self.mesDatas["academies"].append(fiche)
+            self.sauveJSON(filename)
+            print(fiche)
+            self.ui.cBAcademie.addItem(fiche["nom"])
+            self.ui.cBListAcad.addItem(fiche["nom"])
+            self.ui.cBListAcadClass.addItem(fiche["nom"])
+            self.ui.cBListAcadEleve.addItem(fiche["nom"])
+            self.ui.cBAcadMat.addItem(fiche["nom"])
 
     def ajoutEtablissement(self):
         print("Ajout Etablissement")
@@ -266,10 +272,25 @@ class MainWindow(QMainWindow):
         ficheC["anneeSco"]=self.ui.lEAnneScol.text()
         ficheC["PP"]=self.ui.lEProfPrinc.text()
         ficheC["eleves"]=[]
-        # [{"nom":str(), "prenom":str(), "adresse":str(), "appreciationPP":str(), "matieres":[{"nom":str(), "coef" : float(), "appreciation":str(), "notes": []}]}]
-        dicoClasse.append(ficheC)
-        self.sauveJSON(filename)
-        print(ficheC)
+        if self.ui.lENomClasse.text()=='':
+            msgErreur = QMessageBox()
+            msgErreur.setWindowTitle("Erreur")
+            msgErreur.setText("Le nom de la classe est manquant")
+            msgErreur.exec()
+        elif self.ui.lEAnneScol.text()=='':
+            msgErreurAd = QMessageBox()
+            msgErreurAd.setWindowTitle("Erreur")
+            msgErreurAd.setText("L'année scolaire est manquante")
+            msgErreurAd.exec()
+        elif self.ui.lEProfPrinc.text()=='':
+            msgErreurAd = QMessageBox()
+            msgErreurAd.setWindowTitle("Erreur")
+            msgErreurAd.setText("Le nom du professeur principal est manquant")
+            msgErreurAd.exec()
+        else:
+            dicoClasse.append(ficheC)
+            self.sauveJSON(filename)
+            print(ficheC)
 
     def updateEtabAjoutClasse (self):
         self.ui.cBListEtabClass.clear()
@@ -289,9 +310,25 @@ class MainWindow(QMainWindow):
         ficheE["adresse"]=""
         ficheE["appreciationPP"]=""
         ficheE["matieres"]=[]
-        dicoEleve.append(ficheE)
-        self.sauveJSON(filename)
-        print(ficheE)
+        if self.ui.lENomEleve.text()=='':
+            msgErreur = QMessageBox()
+            msgErreur.setWindowTitle("Erreur")
+            msgErreur.setText("Le nom de l'élève est manquant")
+            msgErreur.exec()
+        elif self.ui.lEPrenomEleve.text()=='':
+            msgErreurAd = QMessageBox()
+            msgErreurAd.setWindowTitle("Erreur")
+            msgErreurAd.setText("Le prénom de l'élève est manquant")
+            msgErreurAd.exec()
+        elif self.ui.lEAdresseElev.text()=='':
+            msgErreurAd = QMessageBox()
+            msgErreurAd.setWindowTitle("Erreur")
+            msgErreurAd.setText("L'adresse de l'élève est manquante")
+            msgErreurAd.exec()
+        else:
+            dicoEleve.append(ficheE)
+            self.sauveJSON(filename)
+            print(ficheE)
 
     def updateEtabAjoutEleve (self):
         self.ui.cBListEtabEleve.clear()
@@ -589,7 +626,12 @@ class MainWindow(QMainWindow):
             itemM = QTableWidgetItem(nomMatiere)
             itemMoyE = QTableWidgetItem(moyElev)
             itemMoyC = QTableWidgetItem(moyClass)
-            apprec = QLineEdit()
+            if matiere["appreciation"] != '':
+                print (matiere["appreciation"])
+                appr = matiere["appreciation"]
+                apprec = QLineEdit(appr)
+            else :
+                apprec = QLineEdit()
             self.ui.tWBulletin.setItem(cpt, 0, itemM)
             self.ui.tWBulletin.setItem(cpt, 1, itemMoyE)
             self.ui.tWBulletin.setItem(cpt, 2, itemMoyC)
@@ -644,12 +686,15 @@ class MainWindow(QMainWindow):
         plt.plot()
         plt.savefig("RadarNotes.png", format='png')
 
-        self.ui.labGraphRadar.setPixmap("RadarNotes.png")
-        self.ui.labGraphRadar.setScaledContents(True)
+        self.ui.labGraphRadar.setPixmap(QPixmap("RadarNotes.png").scaled(self.ui.labGraphRadar.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+       # self.ui.labGraphRadar.setScaledContents(True)
 
         # self.ui.labGraphRadar.resize(pixmap.width(), pixmap.height())
 
         plt.clf()
+
+    # def modifAcad(self):
+
 
     def lireJSON(self, fileName):
         with open(fileName) as json_file:

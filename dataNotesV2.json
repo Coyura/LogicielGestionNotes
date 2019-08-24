@@ -41,7 +41,7 @@
                       ]
                     },
                     {
-                      "appreciation": "Dynamique et investie",
+                      "appreciation": "Le glucose n'est pas son ami",
                       "coef": 4.0,
                       "nom": "Biochimie",
                       "notes": [
@@ -73,7 +73,7 @@
                       ]
                     },
                     {
-                      "appreciation": "Dynamique et investie",
+                      "appreciation": "Dynamique et gentille",
                       "coef": 4.0,
                       "nom": "Physipathologie",
                       "notes": [
@@ -90,7 +90,7 @@
                       ]
                     },
                     {
-                      "appreciation": "",
+                      "appreciation": "Utilise trop d'oignons et fait pleurer ses camarades",
                       "coef": 4.0,
                       "nom": "Cuisine TP",
                       "notes": [
@@ -337,11 +337,6 @@
             }
           ],
           "nom": "Rose Carmin"
-        },
-        {
-          "adresse": "",
-          "classes": [],
-          "nom": "aa"
         }
       ],
       "nom": "Toulouse"
