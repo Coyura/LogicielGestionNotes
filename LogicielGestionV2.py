@@ -1,4 +1,5 @@
 import sys, json
+from itertools import chain
 from PySide2.QtWidgets import (QLabel, QApplication, QDoubleSpinBox, QTableWidgetItem, QLineEdit, QMessageBox, QGroupBox, QVBoxLayout, QWidget, QComboBox, QHBoxLayout, QSizePolicy,QMainWindow)
 from PySide2.QtGui import QPixmap
 from PySide2.QtCore import Qt
@@ -76,9 +77,14 @@ class MainWindow(QMainWindow):
         self.ui.cBClassMat.currentIndexChanged.connect(self.updateElevAjoutMat)
         self.ui.pBValMat.clicked.connect(self.ajoutMatière)
 
+        # Modif données Etab, Classe, Eleves, Matiere
+
+
         # Calcul Moyennes Eleve
         self.ui.pBValAppr.clicked.connect(self.updateApprecia)
-        self.ui.pBValCalculMoy.clicked.connect(self.calculMoyenne)
+        # self.ui.pBValCalculMoy.clicked.connect(self.calculMoyenne)
+        self.ui.pBValCalculMoy.clicked.connect(self.affichageMoyEleCla)
+
 
         # Il faut charger les académies dans la comboBox:
         self.updateAcademie()
@@ -554,14 +560,12 @@ class MainWindow(QMainWindow):
                     matiere["appreciation"]=appreciation
                     self.sauveJSON(filename)
 
-    def calculMoyenne (self):
+    def calculMoyEleve(self):
         academie = self.ui.cBAcademie.currentIndex()
         etabliss = self.ui.cBEtablissement.currentIndex()
         cla = self.ui.cBClasse.currentIndex()
-        eleve=self.ui.cBEleveBulletin.currentIndex()
+        eleve = self.ui.cBEleveBulletin.currentIndex()
         matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
-        listeMatEl = []
-        listeNotesEl = []
         dfra = {'Nom': ['Eleve', 'Classe']}
         for m in matEleve:
             notes = m["notes"]
@@ -574,21 +578,25 @@ class MainWindow(QMainWindow):
                 sumNotes = sumNotes + (coefNote * valeurNote)
                 sumCoef = sumCoef + coefNote
                 moyEleMat = sumNotes / sumCoef
-            listeNotesEl.append(moyEleMat)
-            listeMatEl.append(nomMat)
-            # listeMatNotEle = {"nom":}
-            print(m["nom"], moyEleMat)
+            dfra.update({nomMat: [moyEleMat]})
+        return (dfra)
+
+
+    def calculMoyClasse(self):
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        eleve = self.ui.cBEleveBulletin.currentIndex()
+        matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
+        dfrab = {'Nom': ['Eleve', 'Classe']}
+        for m in matEleve:
+            nomMat = m["nom"]
             dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
-            listeMatCla = []
             listeNotesCla = []
-            listMatUniqCla = []
             nbElevMat = 0
             for eleve in dicoClasse["eleves"]:
-                # print(eleve["nom"])
                 for matiere in eleve["matieres"]:
-                    mat = nomMat
-                    # print(matiere["nom"])
-                    if matiere["nom"] == mat:
+                    if matiere["nom"] == nomMat:
                         nbElevMat += 1
                         notes = matiere["notes"]
                         nomMat = matiere["nom"]
@@ -600,7 +608,154 @@ class MainWindow(QMainWindow):
                             sumNotes = sumNotes + (coefNote * valeurNote)
                             sumCoef = sumCoef + coefNote
                             moyenneMat = sumNotes / sumCoef
-                        # print(nomMat, moyenneMat)
+                        listeNotesCla.append(moyenneMat)
+                moyClassMat = (sum(listeNotesCla)) / nbElevMat
+            dfrab.update({nomMat: [moyClassMat]})
+        return (dfrab)
+
+
+    def affichageMoyEleCla (self):
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        eleve = self.ui.cBEleveBulletin.currentIndex()
+        matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
+        dfra = {'Nom': ['Eleve', 'Classe']}
+        dicoNoteEleve = self.calculMoyEleve()
+        dicoNoteClasse = self.calculMoyClasse()
+        print(dicoNoteClasse)
+        print(dicoNoteEleve)
+        for matiere in matEleve:
+            nomMatiere = matiere["nom"]
+            noteE = dicoNoteEleve[nomMatiere]
+            noteC = dicoNoteClasse[nomMatiere]
+            print(noteE, noteC)
+            dfra.update({nomMatiere: [dicoNoteEleve[nomMatiere][0], dicoNoteClasse[nomMatiere][0]]})
+        cpt = 0
+        self.ui.tWBulletin.clear()
+        self.ui.tWBulletin.setColumnCount(4)
+        self.ui.tWBulletin.setHorizontalHeaderLabels(['Matière', 'Moy Elève', 'Moy Classe', 'Appréciation'])
+        elev = self.ui.cBEleveBulletin.currentIndex()
+        dicoElev = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][elev]
+        for matiere in dicoElev["matieres"]:
+            nomMatiere = matiere["nom"]
+            moyElev = str(round(dfra[nomMatiere][0], 2))
+            moyClass = str(round(dfra[nomMatiere][1], 2))
+            self.ui.tWBulletin.setRowCount(cpt + 1)
+            itemM = QTableWidgetItem(nomMatiere)
+            itemMoyE = QTableWidgetItem(moyElev)
+            itemMoyC = QTableWidgetItem(moyClass)
+            if matiere["appreciation"] != '':
+                print(matiere["appreciation"])
+                appr = matiere["appreciation"]
+                apprec = QLineEdit(appr)
+            else:
+                apprec = QLineEdit()
+            self.ui.tWBulletin.setItem(cpt, 0, itemM)
+            self.ui.tWBulletin.setItem(cpt, 1, itemMoyE)
+            self.ui.tWBulletin.setItem(cpt, 2, itemMoyC)
+            self.ui.tWBulletin.setCellWidget(cpt, 3, apprec)
+            cpt += 1
+        self.affichageRadar(dfra)
+
+
+    def affichageRadar(self, moyennes):
+        df = pd.DataFrame(moyennes)
+        # ------- PART 1: Create background
+
+        # number of variable
+        categories = list(df)[1:]
+        N = len(categories)
+
+        # What will be the angle of each axis in the plot? (we divide the plot / number of variable)
+        angles = [n / float(N) * 2 * pi for n in range(N)]
+        angles += angles[:1]
+
+        # Initialise the spider plot
+        ax = plt.subplot(111, polar=True)
+
+        # If you want the first axis to be on top:
+        ax.set_theta_offset(pi / 2)
+        ax.set_theta_direction(-1)
+
+        # Draw one axe per variable + add labels labels yet
+        plt.xticks(angles[:-1], categories)
+
+        # Draw ylabels
+        ax.set_rlabel_position(0)
+        plt.yticks([5, 10, 15, 20], ["5", "10", "15", "20"], color="black", size=7)
+        plt.ylim(0, 20)
+
+        # ------- PART 2: Add plots
+        # Eleve
+        values = df.loc[0].drop('Nom').values.flatten().tolist()
+        values += values[:1]
+        ax.plot(angles, values, 'o-', linewidth=1, linestyle='solid', color='green', label="Elève")
+        ax.fill(angles, values, 'g', alpha=0.1)
+
+        # Classe
+        values = df.loc[1].drop('Nom').values.flatten().tolist()
+        values += values[:1]
+        ax.plot(angles, values, linewidth=1, linestyle='solid', color='red', label="Classe")
+        ax.fill(angles, values, 'r', alpha=0.1)
+
+        # Add legend
+        plt.legend(loc='upper right', bbox_to_anchor=(0.1, 0.1))
+
+        # plt.show()
+        # plt.tight_layout()
+        plt.plot()
+        plt.savefig("RadarNotes.png", format='png')
+
+        self.ui.labGraphRadar.setPixmap(QPixmap("RadarNotes.png").scaled(self.ui.labGraphRadar.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        # self.ui.labGraphRadar.setScaledContents(True)
+
+        # self.ui.labGraphRadar.resize(pixmap.width(), pixmap.height())
+
+        plt.clf()
+
+    # Fonction "complete" (calcul moy Eleve, classe, affichage des bulletins et du radar)
+    def calculMoyenne (self):
+        academie = self.ui.cBAcademie.currentIndex()
+        etabliss = self.ui.cBEtablissement.currentIndex()
+        cla = self.ui.cBClasse.currentIndex()
+        eleve=self.ui.cBEleveBulletin.currentIndex()
+        matEleve = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][eleve]["matieres"]
+        # listeMatEl = []
+        # listeNotesEl = []
+        dfra = {'Nom': ['Eleve', 'Classe']}
+        for m in matEleve:
+            notes = m["notes"]
+            nomMat = m["nom"]
+            sumCoef = 0
+            sumNotes = 0
+            for n in notes:
+                coefNote = n["coef"]
+                valeurNote = n["valeur"]
+                sumNotes = sumNotes + (coefNote * valeurNote)
+                sumCoef = sumCoef + coefNote
+                moyEleMat = sumNotes / sumCoef
+            # listeNotesEl.append(moyEleMat)
+            # listeMatEl.append(nomMat)
+            print(m["nom"], moyEleMat)
+            dicoClasse = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]
+            listeMatCla = []
+            listeNotesCla = []
+            listMatUniqCla = []
+            nbElevMat = 0
+            for eleve in dicoClasse["eleves"]:
+                for matiere in eleve["matieres"]:
+                    if matiere["nom"] == nomMat:
+                        nbElevMat += 1
+                        notes = matiere["notes"]
+                        sumCoef = 0
+                        sumNotes = 0
+                        for n in notes:
+                            coefNote = n["coef"]
+                            valeurNote = n["valeur"]
+                            sumNotes = sumNotes + (coefNote * valeurNote)
+                            sumCoef = sumCoef + coefNote
+                            moyenneMat = sumNotes / sumCoef
                         listeNotesCla.append(moyenneMat)
                         listeMatCla.append(nomMat)
                         listUniMat = np.unique(listeMatCla)
@@ -613,9 +768,6 @@ class MainWindow(QMainWindow):
         self.ui.tWBulletin.clear()
         self.ui.tWBulletin.setColumnCount(4)
         self.ui.tWBulletin.setHorizontalHeaderLabels(['Matière', 'Moy Elève', 'Moy Classe', 'Appréciation'])
-        # academie = self.ui.cBAcademie.currentIndex()
-        # etabliss = self.ui.cBEtablissement.currentIndex()
-        # cla = self.ui.cBClasse.currentIndex()
         elev = self.ui.cBEleveBulletin.currentIndex()
         dicoElev = self.mesDatas["academies"][academie]["etablissements"][etabliss]["classes"][cla]["eleves"][elev]
         for matiere in dicoElev["matieres"]:
@@ -637,6 +789,7 @@ class MainWindow(QMainWindow):
             self.ui.tWBulletin.setItem(cpt, 2, itemMoyC)
             self.ui.tWBulletin.setCellWidget(cpt, 3, apprec)
             cpt += 1
+
 
         # Prod graphique mpyennes
         df = pd.DataFrame(dfra)

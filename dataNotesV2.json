@@ -233,7 +233,7 @@
                       ]
                     },
                     {
-                      "appreciation": "",
+                      "appreciation": "Sa cuisine rend malade",
                       "coef": 4.0,
                       "nom": "Cuisine TP",
                       "notes": [
@@ -331,6 +331,20 @@
                   ],
                   "nom": "Targa",
                   "prenom": "Camille"
+                },
+                {
+                  "adresse": "",
+                  "appreciationPP": "",
+                  "matieres": [
+                    {
+                      "appreciation": "",
+                      "coef": 3.0,
+                      "nom": "Biologie",
+                      "notes": []
+                    }
+                  ],
+                  "nom": "Aubert",
+                  "prenom": "Jean-Luc"
                 }
               ],
               "nom": "Esthe1"

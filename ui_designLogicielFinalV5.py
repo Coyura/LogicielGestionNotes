@@ -3,7 +3,7 @@
 # Form implementation generated from reading ui file 'designLogicielFinalV5.ui',
 # licensing of 'designLogicielFinalV5.ui' applies.
 #
-# Created: Fri Aug 23 14:20:16 2019
+# Created: Tue Aug 27 09:21:32 2019
 #      by: pyside2-uic  running on PySide2 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
@@ -13,7 +13,7 @@ from PySide2 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(2958, 790)
+        MainWindow.resize(3148, 1095)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout_20 = QtWidgets.QHBoxLayout(self.centralwidget)
@@ -165,25 +165,25 @@ class Ui_MainWindow(object):
         self.verticalLayout_53.setObjectName("verticalLayout_53")
         spacerItem5 = QtWidgets.QSpacerItem(20, 30, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         self.verticalLayout_53.addItem(spacerItem5)
-        self.pBAjoutMatiere_2 = QtWidgets.QPushButton(self.centralwidget)
-        font = QtGui.QFont()
-        font.setFamily("Showcard Gothic")
-        self.pBAjoutMatiere_2.setFont(font)
-        self.pBAjoutMatiere_2.setStyleSheet("background-color: rgb(0, 170, 255);")
-        self.pBAjoutMatiere_2.setObjectName("pBAjoutMatiere_2")
-        self.verticalLayout_53.addWidget(self.pBAjoutMatiere_2)
-        self.horizontalLayout_37.addLayout(self.verticalLayout_53)
-        self.verticalLayout_19 = QtWidgets.QVBoxLayout()
-        self.verticalLayout_19.setObjectName("verticalLayout_19")
-        spacerItem6 = QtWidgets.QSpacerItem(20, 30, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
-        self.verticalLayout_19.addItem(spacerItem6)
         self.pBAjoutMatiere = QtWidgets.QPushButton(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("Showcard Gothic")
         self.pBAjoutMatiere.setFont(font)
         self.pBAjoutMatiere.setStyleSheet("background-color: rgb(0, 170, 255);")
         self.pBAjoutMatiere.setObjectName("pBAjoutMatiere")
-        self.verticalLayout_19.addWidget(self.pBAjoutMatiere)
+        self.verticalLayout_53.addWidget(self.pBAjoutMatiere)
+        self.horizontalLayout_37.addLayout(self.verticalLayout_53)
+        self.verticalLayout_19 = QtWidgets.QVBoxLayout()
+        self.verticalLayout_19.setObjectName("verticalLayout_19")
+        spacerItem6 = QtWidgets.QSpacerItem(20, 30, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        self.verticalLayout_19.addItem(spacerItem6)
+        self.pBModifDonnees = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("Showcard Gothic")
+        self.pBModifDonnees.setFont(font)
+        self.pBModifDonnees.setStyleSheet("background-color: rgb(0, 170, 255);")
+        self.pBModifDonnees.setObjectName("pBModifDonnees")
+        self.verticalLayout_19.addWidget(self.pBModifDonnees)
         self.horizontalLayout_37.addLayout(self.verticalLayout_19)
         self.verticalLayout_12.addLayout(self.horizontalLayout_37)
         spacerItem7 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
@@ -1195,7 +1195,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_20.addLayout(self.horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 2958, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 3148, 21))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -1215,8 +1215,8 @@ class Ui_MainWindow(object):
         self.pBAjoutEtablissement.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvel Etablissement", None, -1))
         self.pBAjoutClasse.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvelle Classe", None, -1))
         self.pBAjoutEleve.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvel Elève", None, -1))
-        self.pBAjoutMatiere_2.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvelle Matière", None, -1))
-        self.pBAjoutMatiere.setText(QtWidgets.QApplication.translate("MainWindow", "Modification Données", None, -1))
+        self.pBAjoutMatiere.setText(QtWidgets.QApplication.translate("MainWindow", "Nouvelle Matière", None, -1))
+        self.pBModifDonnees.setText(QtWidgets.QApplication.translate("MainWindow", "Modification Données", None, -1))
         self.label_4.setText(QtWidgets.QApplication.translate("MainWindow", "Gestion des notes", None, -1))
         self.label_10.setText(QtWidgets.QApplication.translate("MainWindow", "Matière :", None, -1))
         self.label_5.setText(QtWidgets.QApplication.translate("MainWindow", "Nom Devoir :", None, -1))
